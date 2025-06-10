@@ -27,10 +27,10 @@ COPY . .
 RUN npm run build
 
 # Expose port
-EXPOSE 7000
+EXPOSE 5000
 
 # Set environment variable for port (optional override)
-ENV PORT=7000
+ENV PORT=5000
 
 # Start the application
 CMD ["npm", "start"]
