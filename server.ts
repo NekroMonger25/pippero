@@ -83,7 +83,7 @@ builder.defineStreamHandler(async ({ type, id }: StreamHandlerArgs) => {
 
 const serveHTTP = async () => {
     const { serveHTTP: serve } = await import('stremio-addon-sdk');
-    const port = process.env.PORT ? parseInt(process.env.PORT) : 7000;
+    const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
     serve(builder.getInterface(), { port });
     console.log(`Addon active on: http://127.0.0.1:${port}`);
     console.log(`To install in Stremio, use: http://127.0.0.1:${port}/manifest.json`);
