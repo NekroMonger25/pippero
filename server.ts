@@ -84,9 +84,36 @@ builder.defineStreamHandler(async ({ type, id }: StreamHandlerArgs) => {
 const serveHTTP = async () => {
     const { serveHTTP: serve } = await import('stremio-addon-sdk');
     const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
+    
+    // Log startup info
+    console.log('Starting Eurostreaming Addon server...');
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`Port: ${port}`);
+    if (process.env.TMDB_API_KEY) {
+        console.log('TMDB API key is configured');
+    } else {
+        console.warn('Warning: TMDB_API_KEY is not set. Series lookup will be disabled.');
+    }
+
     serve(builder.getInterface(), { port });
-    console.log(`Addon active on: http://127.0.0.1:${port}`);
-    console.log(`To install in Stremio, use: http://127.0.0.1:${port}/manifest.json`);
+    
+    // Log server URLs
+    const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1';
+    console.log(`Addon server listening on: http://${host}:${port}`);
+    console.log(`Manifest URL: http://${host}:${port}/manifest.json`);
 };
 
-serveHTTP();
+process.on('SIGINT', () => {
+    console.log('Received SIGINT. Cleaning up...');
+    process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM. Cleaning up...');
+    process.exit(0);
+});
+
+serveHTTP().catch(error => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+});

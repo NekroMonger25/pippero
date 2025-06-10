@@ -8,22 +8,29 @@ const { evalResolver } = require("./evalResolver");
 const axios_1 = __importDefault(require("axios"));
 require('dotenv').config();
 const baseurl = "https://eurostreaming.my/";
-const tmdbApiKey = process.env.TMDB_API_KEY;
+function getTmdbApiKey() {
+    return process.env.TMDB_API_KEY || null;
+}
 async function getSeriesTitle(imdbId) {
     try {
+        const apiKey = getTmdbApiKey();
+        if (!apiKey) {
+            console.error('TMDB_API_KEY not set, cannot fetch series info');
+            return null;
+        }
         console.log('Fetching series info from TMDB for IMDb ID:', imdbId);
         const fullImdbId = imdbId.startsWith('tt') ? imdbId : `tt${imdbId}`;
         const tmdbAxios = axios_1.default.create({
             headers: {
-                'Authorization': `Bearer ${tmdbApiKey}`,
+                'Authorization': `Bearer ${apiKey}`,
                 'Accept': 'application/json'
             }
         });
-        const findResponse = await tmdbAxios.get(`https://api.themoviedb.org/3/find/${fullImdbId}?api_key=${tmdbApiKey}&external_source=imdb_id`);
+        const findResponse = await tmdbAxios.get(`https://api.themoviedb.org/3/find/${fullImdbId}?api_key=${apiKey}&external_source=imdb_id`);
         console.log('TMDB Find Response:', JSON.stringify(findResponse.data, null, 2));
         if (findResponse.data.tv_results && findResponse.data.tv_results.length > 0) {
             const tmdbId = findResponse.data.tv_results[0].id;
-            const detailsResponse = await tmdbAxios.get(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${tmdbApiKey}&language=it-IT`);
+            const detailsResponse = await tmdbAxios.get(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=it-IT`);
             console.log('TMDB Details Response:', JSON.stringify(detailsResponse.data, null, 2));
             const title = detailsResponse.data.name || detailsResponse.data.original_name;
             console.log('Found series title:', title);

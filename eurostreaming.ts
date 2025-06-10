@@ -28,20 +28,20 @@ interface TMDBTVDetails {
 
 const baseurl = "https://eurostreaming.my/";
 
-function getTmdbApiKey(): string {
-    const apiKey = process.env.TMDB_API_KEY;
-    if (!apiKey) {
-        throw new Error('TMDB_API_KEY is not set in environment variables');
-    }
-    return apiKey;
+function getTmdbApiKey(): string | null {
+    return process.env.TMDB_API_KEY || null;
 }
 
-async function getSeriesTitle(imdbId: string): Promise<string | null> {
-    try {
+async function getSeriesTitle(imdbId: string): Promise<string | null> {    try {
+        const apiKey = getTmdbApiKey();
+        if (!apiKey) {
+            console.error('TMDB_API_KEY not set, cannot fetch series info');
+            return null;
+        }
+
         console.log('Fetching series info from TMDB for IMDb ID:', imdbId);
         const fullImdbId = imdbId.startsWith('tt') ? imdbId : `tt${imdbId}`;
         
-        const apiKey = getTmdbApiKey();
         const tmdbAxios = axios.create({
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
