@@ -26,7 +26,7 @@ interface TMDBTVDetails {
     original_name: string;
 }
 
-const baseurl = "https://eurostreaming.my/";
+const baseurl = "https://eurostreaming.study/";
 
 function getTmdbApiKey(): string | null {
     return process.env.TMDB_API_KEY || null;
